@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chamados Distribuidora — Tempo Geração GD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:       #1077FF;
+  --blue-dark:  #0A56CC;
+  --blue-light: #EEF6FF;
+  --blue-mid:   #DBEAFE;
+  --green:      #16A34A;
+  --green-l:    #DCFCE7;
+  --red:        #DC2626;
+  --red-l:      #FEE2E2;
+  --amber:      #D97706;
+  --amber-l:    #FEF3C7;
+  --text:       #09090B;
+  --mid:        #3E3E46;
+  --muted:      #70707B;
+  --border:     #E4E4E7;
+  --bg:         #F8FAFF;
+  --surface:    #FFFFFF;
+  --radius:     10px;
+  --radius-lg:  14px;
+}
+
+body {
+  font-family: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* ── LOGIN ── */
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--bg);
+}
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 48px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 4px 24px rgba(16,119,255,0.08);
+}
+.login-hdr {
+  background: linear-gradient(135deg, #0A56CC 0%, #1077FF 60%, #3B8FFF 100%);
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 24px;
+  color: #fff;
+}
+.login-hdr-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px; }
+.login-hdr-name  { font-size: 20px; font-weight: 900; }
+.login-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.login-sub   { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+.btn-login {
+  background: linear-gradient(135deg, #0A56CC, #1077FF);
+  color: #fff;
+  border: none;
+  padding: 13px 24px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: opacity 0.2s;
+  box-shadow: 0 4px 14px rgba(16,119,255,0.3);
+}
+.btn-login:hover { opacity: 0.9; }
+.login-note { font-size: 11px; color: var(--muted); }
+
+/* ── HEADER ── */
+.app-header {
+  background: linear-gradient(135deg, #0A56CC 0%, #1077FF 60%, #3B8FFF 100%);
+  color: #fff;
+  padding: 0 32px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(10,86,204,0.25);
+}
+.hdr-left { display: flex; align-items: center; gap: 16px; }
+.hdr-badge {
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.hdr-title { font-size: 16px; font-weight: 700; }
+.hdr-sub   { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+.hdr-right { display: flex; align-items: center; gap: 12px; font-size: 13px; opacity: 0.9; }
+.btn-logout {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-logout:hover { background: rgba(255,255,255,0.25); }
+
+/* ── LAYOUT ── */
+.app-body { display: flex; height: calc(100vh - 58px); }
+
+.sidebar {
+  width: 210px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 18px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 18px 4px;
+}
+.nav-btn {
+  background: none;
+  border: none;
+  color: var(--mid);
+  padding: 9px 18px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  width: 100%;
+}
+.nav-btn:hover { background: var(--blue-light); color: var(--blue); }
+.nav-btn.active { color: var(--blue); border-left-color: var(--blue); background: var(--blue-light); }
+.nav-divider { height: 1px; background: var(--border); margin: 10px 14px; }
+
+.content { flex: 1; overflow-y: auto; padding: 28px 32px; }
+
+/* ── SECTION HEADER ── */
+.section-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.section-title { font-size: 20px; font-weight: 900; color: var(--text); }
+.section-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ── STATS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  border-top: 3px solid var(--border);
+}
+.stat-card.blue   { border-top-color: var(--blue); }
+.stat-card.red    { border-top-color: var(--red); }
+.stat-card.amber  { border-top-color: var(--amber); }
+.stat-card.green  { border-top-color: var(--green); }
+.stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.stat-value { font-size: 30px; font-weight: 900; }
+.stat-card.blue  .stat-value { color: var(--blue); }
+.stat-card.red   .stat-value { color: var(--red); }
+.stat-card.amber .stat-value { color: var(--amber); }
+.stat-card.green .stat-value { color: var(--green); }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  background: linear-gradient(135deg, #0A56CC, #1077FF);
+  color: #fff;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 2px 8px rgba(16,119,255,0.25);
+  transition: opacity 0.2s;
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--mid);
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-secondary:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+.btn-sm { padding: 5px 12px; font-size: 11px; }
+
+/* ── FILTERS ── */
+.filters { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.filter-select, .filter-input {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+}
+.filter-select:focus, .filter-input:focus { outline: none; border-color: var(--blue); }
+
+/* ── TABLE ── */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+table { width: 100%; border-collapse: collapse; }
+thead { background: linear-gradient(135deg, #0A56CC, #1077FF); }
+th {
+  text-align: left;
+  padding: 11px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+  white-space: nowrap;
+}
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--blue-light); }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.badge-andamento { background: var(--blue-mid);  color: var(--blue-dark); }
+.badge-encerrado { background: var(--green-l);   color: var(--green); }
+.badge-vencido   { background: var(--red-l);     color: var(--red); }
+.badge-urgente   { background: var(--amber-l);   color: var(--amber); }
+
+.inst-tag { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.inst-neo1  { background: var(--blue-light); color: var(--blue-dark); border: 1px solid var(--blue-mid); }
+.inst-ouvid { background: var(--amber-l); color: var(--amber); border: 1px solid #FDE68A; }
+.inst-aneel { background: var(--red-l); color: var(--red); border: 1px solid #FECACA; }
+
+.prazo-ok     { color: var(--green); font-size: 12px; font-weight: 600; }
+.prazo-alerta { color: var(--amber); font-size: 12px; font-weight: 600; }
+.prazo-vencido{ color: var(--red);   font-size: 12px; font-weight: 600; }
+.comp-tag { font-size: 10px; font-weight: 700; color: var(--muted); background: var(--bg); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
+.proto-code { font-size: 12px; font-weight: 600; color: var(--mid); }
+
+/* ── EMPTY ── */
+.empty-state { text-align: center; padding: 56px 20px; color: var(--muted); }
+.empty-icon  { font-size: 32px; margin-bottom: 10px; }
+.empty-title { font-size: 15px; font-weight: 700; color: var(--mid); margin-bottom: 4px; }
+
+/* ── MODAL ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(9,9,11,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 660px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+}
+.modal-header {
+  background: linear-gradient(135deg, #0A56CC, #1077FF);
+  color: #fff;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.modal-title { font-size: 15px; font-weight: 700; }
+.modal-sub   { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+.modal-close { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 28px; height: 28px; border-radius: 6px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.modal-close:hover { background: rgba(255,255,255,0.28); }
+.modal-body { padding: 22px 24px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid var(--border); }
+
+/* ── FORM ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { font-size: 11px; font-weight: 700; color: var(--mid); text-transform: uppercase; letter-spacing: 0.05em; }
+.form-label.req::after { content: ' *'; color: var(--red); }
+.form-input, .form-select, .form-textarea {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,119,255,0.1); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-hint { font-size: 11px; color: var(--muted); }
+.prazo-preview {
+  background: var(--blue-light);
+  border: 1.5px solid var(--blue-mid);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue-dark);
+}
+.info-banner {
+  background: var(--blue-light);
+  border: 1px solid var(--blue-mid);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--blue-dark);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+/* ── DETAIL ── */
+.detail-block { margin-bottom: 20px; }
+.detail-block-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.detail-item { display: flex; flex-direction: column; gap: 2px; }
+.detail-key { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.detail-val { font-size: 13px; font-weight: 600; color: var(--text); }
+.log-item { border-left: 3px solid var(--blue-mid); padding: 8px 14px; margin-bottom: 8px; border-radius: 0 6px 6px 0; background: var(--bg); }
+.log-date { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+.log-text { font-size: 12px; color: var(--mid); margin-top: 3px; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 13px; font-weight: 600;
+  color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transform: translateY(80px); opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 999; max-width: 320px;
+  display: flex; align-items: center; gap: 8px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── SPINNER ── */
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.hidden { display: none !important; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-hdr">
+      <div class="login-hdr-title">Tempo Geração · Geração Distribuída</div>
+      <div class="login-hdr-name">Chamados Distribuidora</div>
+    </div>
+    <div class="login-title">Acesso ao Painel</div>
+    <div class="login-sub">Entre com sua conta Microsoft para acessar o controle de chamados Neoenergia / Aneel.</div>
+    <button class="btn-login" onclick="fazerLogin()">
+      <svg width="18" height="18" viewBox="0 0 23 23" fill="none"><rect x="1" y="1" width="10" height="10" fill="#f25022"/><rect x="12" y="1" width="10" height="10" fill="#7fba00"/><rect x="1" y="12" width="10" height="10" fill="#00a4ef"/><rect x="12" y="12" width="10" height="10" fill="#ffb900"/></svg>
+      Entrar com Microsoft
+    </button>
+  </div>
+  <div class="login-note">Tempo Geração · GD · Sistema interno</div>
+</div>
+
+<!-- APP -->
+<div id="appScreen" class="hidden">
+
+  <header class="app-header">
+    <div class="hdr-left">
+      <span class="hdr-badge">TG · GD</span>
+      <div>
+        <div class="hdr-title">Chamados Distribuidora</div>
+        <div class="hdr-sub">Neoenergia · Aneel · SCEE</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <span id="userName"></span>
+      <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+
+    <nav class="sidebar">
+      <span class="nav-label">Menu</span>
+      <button class="nav-btn active" onclick="showTab('dashboard')" id="tab-dashboard">
+        <span>◈</span> Dashboard
+      </button>
+      <button class="nav-btn" onclick="showTab('lista')" id="tab-lista">
+        <span>☰</span> Chamados
+      </button>
+      <div class="nav-divider"></div>
+      <span class="nav-label">Ações</span>
+      <button class="nav-btn" onclick="abrirModalNovo()">
+        <span>＋</span> Novo Chamado
+      </button>
+    </nav>
+
+    <main class="content">
+
+      <!-- DASHBOARD -->
+      <div id="pane-dashboard">
+        <div class="section-hdr">
+          <div>
+            <div class="section-title">Dashboard</div>
+            <div class="section-sub" id="dash-sub">Carregando dados…</div>
+          </div>
+          <button class="btn-secondary btn-sm" onclick="carregarChamados()">↻ Atualizar</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card blue"><div class="stat-label">Em Andamento</div><div class="stat-value" id="st-andamento">—</div></div>
+          <div class="stat-card red"><div class="stat-label">Vencidos</div><div class="stat-value" id="st-vencidos">—</div></div>
+          <div class="stat-card amber"><div class="stat-label">Vence em 2 dias</div><div class="stat-value" id="st-urgente">—</div></div>
+          <div class="stat-card green"><div class="stat-label">Encerrados</div><div class="stat-value" id="st-encerrados">—</div></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Protocolo</th><th>UC</th><th>Instância</th><th>Prazo SLA</th><th>Status</th><th>Responsável</th><th></th></tr></thead>
+            <tbody id="dash-tbody"><tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⟳</div><div class="empty-title">Carregando…</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LISTA -->
+      <div id="pane-lista" class="hidden">
+        <div class="section-hdr">
+          <div><div class="section-title">Todos os Chamados</div><div class="section-sub">Histórico completo</div></div>
+          <button class="btn-primary" onclick="abrirModalNovo()">＋ Novo Chamado</button>
+        </div>
+        <div class="filters">
+          <select class="filter-select" id="filt-status" onchange="renderLista()">
+            <option value="">Todos os status</option>
+            <option value="Em andamento">Em andamento</option>
+            <option value="Encerrado">Encerrado</option>
+          </select>
+          <select class="filter-select" id="filt-instancia" onchange="renderLista()">
+            <option value="">Todas as instâncias</option>
+            <option value="Neoenergia – 1ª Instância">Neo 1ª Inst.</option>
+            <option value="Neoenergia – Ouvidoria">Neo Ouvidoria</option>
+            <option value="Aneel">Aneel</option>
+          </select>
+          <select class="filter-select" id="filt-resp" onchange="renderLista()">
+            <option value="">Todos responsáveis</option>
+            <option>Lucas Moller</option>
+            <option>Fernando Farias</option>
+            <option>Isabel Martins</option>
+            <option>Eloise Ferreira</option>
+            <option>Alice Bernardo</option>
+            <option>Jessiane Pereira</option>
+          </select>
+          <input class="filter-input" id="filt-busca" placeholder="Buscar protocolo ou UC…" oninput="renderLista()" />
+          <button class="btn-secondary btn-sm" onclick="carregarChamados()">↻ Atualizar</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Protocolo / ID</th><th>Categoria</th><th>UC</th><th>Instância</th><th>Abertura</th><th>Prazo SLA</th><th>Status</th><th>Responsável</th><th></th></tr></thead>
+            <tbody id="lista-tbody"><tr><td colspan="9"><div class="empty-state"><div class="empty-icon">⟳</div><div class="empty-title">Carregando…</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL NOVO CHAMADO -->
+<div class="modal-overlay" id="modalNovo">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Abrir Novo Chamado</div>
+        <div class="modal-sub">Preencha todos os campos obrigatórios</div>
+      </div>
+      <button class="modal-close" onclick="fecharModal('modalNovo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-banner">📧 Ao salvar, um <strong>e-mail automático</strong> será enviado ao responsável com protocolo, instância e prazo.</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label req">Instância</label>
+          <select class="form-select" id="f-instancia" onchange="calcPrazo()">
+            <option value="">Selecione…</option>
+            <option value="Neoenergia – 1ª Instância">Neoenergia – 1ª Instância (5 dias úteis)</option>
+            <option value="Neoenergia – Ouvidoria">Neoenergia – Ouvidoria (10 dias úteis)</option>
+            <option value="Aneel">Aneel (20 dias corridos)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label req">Categoria</label>
+          <select class="form-select" id="f-categoria">
+            <option value="">Selecione…</option>
+            <option>Compensação Incorreta</option>
+            <option>Fatura em GD 2</option>
+            <option>Desligamento Indevido</option>
+            <option>Fatura não emitida</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label req">Código do Cliente (UC)</label>
+          <input class="form-input" id="f-uc" placeholder="Ex: 70280584" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Protocolo Coelba</label>
+          <input class="form-input" id="f-protocolo" placeholder="Ex: NEO-2026-00001" />
+        </div>
+        <div class="form-group">
+          <label class="form-label req">Data de Abertura</label>
+          <input class="form-input" type="date" id="f-data" onchange="calcPrazo()" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prazo SLA (calculado)</label>
+          <div class="prazo-preview" id="prazo-preview">— selecione instância e data</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label req">Responsável</label>
+          <select class="form-select" id="f-responsavel">
+            <option value="">Selecione…</option>
+            <option value="Lucas Moller|lucas.moller@tempogeracao.com.br">Lucas Moller</option>
+            <option value="Fernando Farias|fernando.farias@tempoenergia.com.br">Fernando Farias</option>
+            <option value="Isabel Martins|isabel.martins@tempoenergia.com.br">Isabel Martins</option>
+            <option value="Eloise Ferreira|eloise.ferreira@tempogeracao.com.br">Eloise Ferreira</option>
+            <option value="Alice Bernardo|alice.bernardo@tempogeracao.com.br">Alice Bernardo</option>
+            <option value="Jessiane Pereira|jessiane.pereira@tempoenergia.com.br">Jessiane Pereira</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Complementar ao Chamado</label>
+          <input class="form-input" id="f-complementar" placeholder="ID ou protocolo anterior" />
+          <span class="form-hint">Deixe em branco se for chamado independente</span>
+        </div>
+        <div class="form-group full">
+          <label class="form-label req">Descrição</label>
+          <textarea class="form-textarea" id="f-descricao" rows="4" placeholder="Descreva o problema com detalhes (UC, competência, valor…)"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Observações</label>
+          <textarea class="form-textarea" id="f-obs" rows="2" placeholder="Observações adicionais…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="fecharModal('modalNovo')">Cancelar</button>
+      <button class="btn-primary" id="btn-salvar-novo" onclick="salvarNovoChamado()">＋ Abrir Chamado</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE -->
+<div class="modal-overlay" id="modalDetalhe">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="det-titulo">Chamado</div>
+        <div class="modal-sub" id="det-sub"></div>
+      </div>
+      <button class="modal-close" onclick="fecharModal('modalDetalhe')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-block">
+        <div class="detail-block-title">Informações do Chamado</div>
+        <div class="detail-grid" id="det-info"></div>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Atualizar / Inserir Resposta</div>
+        <div class="form-grid" style="gap:12px">
+          <div class="form-group">
+            <label class="form-label">Novo Status</label>
+            <select class="form-select" id="upd-status">
+              <option value="Em andamento">Em andamento</option>
+              <option value="Encerrado">Encerrado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Protocolo Atualizado</label>
+            <input class="form-input" id="upd-protocolo" placeholder="Novo protocolo (se houver)" />
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Resposta / Atualização</label>
+            <textarea class="form-textarea" id="upd-resposta" rows="3" placeholder="Insira a resposta recebida ou atualização do caso…"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Histórico de Atualizações</div>
+        <div id="det-historico"><div style="color:var(--muted);font-size:12px">Nenhuma atualização registrada.</div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="fecharModal('modalDetalhe')">Fechar</button>
+      <button class="btn-primary" id="btn-salvar-upd" onclick="salvarAtualizacao()">✓ Salvar Atualização</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><span id="toast-icon"></span><span id="toast-msg"></span></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════
+const CLIENT_ID = 'f5024f60-9725-451f-9776-2e7326d9129a';
+const TENANT_ID = 'c4b30763-e65e-4f22-a4a9-a304775f3c80';
+const SITE_URL  = 'https://tempoenergiacombr.sharepoint.com/sites/GD-GeraoDistribuda';
+const LIST_NAME = 'Chamados Coelba';
+const SCOPES    = ['https://tempoenergiacombr.sharepoint.com/AllSites.Write'];
+
+const msalConfig = {
+  auth: { clientId: CLIENT_ID, authority: `https://login.microsoftonline.com/${TENANT_ID}`, redirectUri: window.location.href.split('?')[0] },
+  cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
+};
+let msalApp = null;
+let allChamados = [], chamadoAtual = null;
+
+async function inicializar() {
+  msalApp = new msal.PublicClientApplication(msalConfig);
+  await msalApp.initialize();
+  const resp = await msalApp.handleRedirectPromise();
+  if (resp) { mostrarApp(resp.account); return; }
+  const accounts = msalApp.getAllAccounts();
+  if (accounts.length > 0) {
+    try {
+      await msalApp.acquireTokenSilent({ scopes: SCOPES, account: accounts[0] });
+      mostrarApp(accounts[0]);
+    } catch { document.getElementById('loginScreen').classList.remove('hidden'); }
+  } else {
+    document.getElementById('loginScreen').classList.remove('hidden');
+  }
+}
+
+async function fazerLogin() { await msalApp.loginRedirect({ scopes: SCOPES }); }
+function fazerLogout() { msalApp.logoutRedirect(); }
+
+function mostrarApp(account) {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+  document.getElementById('userName').textContent = account.name || account.username;
+  carregarChamados();
+}
+
+// ═══════════════════════════════════════════════════════
+//  API SHAREPOINT
+// ═══════════════════════════════════════════════════════
+async function getToken() {
+  const accounts = msalApp.getAllAccounts();
+  const r = await msalApp.acquireTokenSilent({ scopes: SCOPES, account: accounts[0] });
+  return r.accessToken;
+}
+
+async function spGet(endpoint) {
+  const token = await getToken();
+  const res = await fetch(`${SITE_URL}/_api/web/lists/getbytitle('${encodeURIComponent(LIST_NAME)}')/items${endpoint}`, {
+    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json;odata=nometadata' }
+  });
+  if (!res.ok) throw new Error(`SP ${res.status}`);
+  return res.json();
+}
+
+async function spPost(endpoint, body) {
+  const token = await getToken();
+  const res = await fetch(`${SITE_URL}/_api/web/lists/getbytitle('${encodeURIComponent(LIST_NAME)}')/items${endpoint}`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json;odata=nometadata', 'Content-Type': 'application/json;odata=nometadata' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(`SP ${res.status}: ${await res.text()}`);
+  return res.status === 204 ? null : res.json();
+}
+
+async function spMerge(id, body) {
+  const token = await getToken();
+  const res = await fetch(`${SITE_URL}/_api/web/lists/getbytitle('${encodeURIComponent(LIST_NAME)}')/items(${id})`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json;odata=nometadata', 'Content-Type': 'application/json;odata=nometadata', 'X-HTTP-Method': 'MERGE', 'If-Match': '*' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(`SP MERGE ${res.status}: ${await res.text()}`);
+}
+
+// ═══════════════════════════════════════════════════════
+//  CARREGAR
+// ═══════════════════════════════════════════════════════
+async function carregarChamados() {
+  try {
+    const data = await spGet('?$orderby=Created desc&$top=500');
+    allChamados = (data.value || []).map(i => ({
+      ID: i.ID, Titulo: i.Title||'', Instancia: i.Instancia||'', Categoria: i.Categoria||'',
+      UC: i.UC||'', ProtocoloCoelba: i.ProtocoloCoelba||'', DataAbertura: i.DataAbertura||'',
+      PrazoSLA: i.PrazoSLA||'', Status: i.Status||'Em andamento', Responsavel: i.Responsavel||'',
+      EmailResponsavel: i.EmailResponsavel||'', Complementar: i.Complementar||'',
+      Descricao: i.Descricao||'', Observacoes: i.Observacoes||'', Historico: i.Historico||''
+    }));
+    renderDashboard(); renderLista();
+    document.getElementById('dash-sub').textContent = `${allChamados.length} chamado(s) · atualizado agora`;
+  } catch(e) { toast('⚠ Erro ao carregar: ' + e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  UTILS DATAS
+// ═══════════════════════════════════════════════════════
+const INST_CFG = {
+  'Neoenergia – 1ª Instância': { dias:5,  tipo:'uteis' },
+  'Neoenergia – Ouvidoria':    { dias:10, tipo:'uteis' },
+  'Aneel':                     { dias:20, tipo:'corridos' }
+};
+function addBizDays(date, n) {
+  let d = new Date(date), a = 0;
+  while (a < n) { d.setDate(d.getDate()+1); if (d.getDay()!==0 && d.getDay()!==6) a++; }
+  return d;
+}
+function calcPrazoDate(inst, data) {
+  const cfg = INST_CFG[inst]; if (!cfg||!data) return null;
+  const base = new Date(data+'T12:00:00');
+  if (cfg.tipo==='uteis') return addBizDays(base, cfg.dias);
+  const r = new Date(base); r.setDate(r.getDate()+cfg.dias); return r;
+}
+function fmtDate(dt) {
+  if (!dt) return '—';
+  return new Date(dt).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+}
+function diasRest(prazo) {
+  if (!prazo) return null;
+  const h = new Date(); h.setHours(0,0,0,0);
+  const p = new Date(prazo); p.setHours(0,0,0,0);
+  return Math.round((p-h)/86400000);
+}
+function prazoStatus(c) {
+  if (c.Status==='Encerrado') return 'encerrado';
+  const d = diasRest(c.PrazoSLA);
+  if (d===null) return 'ok'; if (d<0) return 'vencido'; if (d<=2) return 'urgente'; return 'ok';
+}
+function prazoLabel(c) {
+  if (!c.PrazoSLA) return '—';
+  const d = diasRest(c.PrazoSLA), dt = fmtDate(c.PrazoSLA);
+  if (c.Status==='Encerrado') return dt;
+  if (d===null) return dt;
+  if (d<0)  return `${dt} <span style="color:var(--red);font-size:10px">(${Math.abs(d)}d vencido)</span>`;
+  if (d===0) return `${dt} <span style="color:var(--red);font-size:10px">(hoje)</span>`;
+  if (d<=2) return `${dt} <span style="color:var(--amber);font-size:10px">(${d}d)</span>`;
+  return `${dt} <span style="color:var(--muted);font-size:10px">(${d}d)</span>`;
+}
+function calcPrazo() {
+  const inst = document.getElementById('f-instancia').value;
+  const data = document.getElementById('f-data').value;
+  const d = calcPrazoDate(inst, data);
+  document.getElementById('prazo-preview').textContent = d ? fmtDate(d) : '— selecione instância e data';
+}
+
+// ═══════════════════════════════════════════════════════
+//  BADGES
+// ═══════════════════════════════════════════════════════
+function instTag(inst) {
+  const m = { 'Neoenergia – 1ª Instância':['inst-neo1','Neo 1ª'], 'Neoenergia – Ouvidoria':['inst-ouvid','Ouvidoria'], 'Aneel':['inst-aneel','Aneel'] };
+  const [cls,lbl] = m[inst]||['inst-neo1',inst];
+  return `<span class="inst-tag ${cls}">${lbl}</span>`;
+}
+function statusBadge(s) {
+  return s==='Encerrado'
+    ? `<span class="badge badge-encerrado">● Encerrado</span>`
+    : `<span class="badge badge-andamento">● Em andamento</span>`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderDashboard() {
+  const em  = allChamados.filter(c => c.Status==='Em andamento');
+  const enc = allChamados.filter(c => c.Status==='Encerrado');
+  const vec = em.filter(c => prazoStatus(c)==='vencido');
+  const urg = em.filter(c => prazoStatus(c)==='urgente');
+  document.getElementById('st-andamento').textContent  = em.length;
+  document.getElementById('st-vencidos').textContent   = vec.length;
+  document.getElementById('st-urgente').textContent    = urg.length;
+  document.getElementById('st-encerrados').textContent = enc.length;
+  const rows = [...vec, ...urg.filter(c=>!vec.includes(c)), ...em.filter(c=>prazoStatus(c)==='ok')].slice(0,10);
+  const tbody = document.getElementById('dash-tbody');
+  if (!rows.length) { tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">✓</div><div class="empty-title">Nenhum chamado em aberto</div></div></td></tr>`; return; }
+  tbody.innerHTML = rows.map(c => {
+    const ps = prazoStatus(c);
+    const pc = ps==='vencido'?'prazo-vencido':ps==='urgente'?'prazo-alerta':'prazo-ok';
+    return `<tr>
+      <td><span class="proto-code">${c.ProtocoloCoelba||c.Titulo||'—'}</span>${c.Complementar?`<span class="comp-tag">compl.</span>`:''}</td>
+      <td style="font-size:12px;color:var(--mid)">${c.UC||'—'}</td>
+      <td>${instTag(c.Instancia)}</td>
+      <td class="${pc}">${prazoLabel(c)}</td>
+      <td>${ps==='vencido'?'<span class="badge badge-vencido">● Vencido</span>':ps==='urgente'?'<span class="badge badge-urgente">● Urgente</span>':statusBadge(c.Status)}</td>
+      <td style="font-size:12px;color:var(--mid)">${c.Responsavel||'—'}</td>
+      <td><button class="btn-secondary btn-sm" onclick="abrirDetalhe(${c.ID})">Ver</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER LISTA
+// ═══════════════════════════════════════════════════════
+function renderLista() {
+  const fS=document.getElementById('filt-status').value, fI=document.getElementById('filt-instancia').value;
+  const fR=document.getElementById('filt-resp').value,   fB=document.getElementById('filt-busca').value.toLowerCase();
+  const fil = allChamados.filter(c => {
+    if (fS && c.Status!==fS) return false;
+    if (fI && c.Instancia!==fI) return false;
+    if (fR && c.Responsavel!==fR) return false;
+    if (fB && !(c.ProtocoloCoelba||'').toLowerCase().includes(fB) && !(c.UC||'').toLowerCase().includes(fB)) return false;
+    return true;
+  });
+  const tbody = document.getElementById('lista-tbody');
+  if (!fil.length) { tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">◎</div><div class="empty-title">Nenhum chamado encontrado</div></div></td></tr>`; return; }
+  tbody.innerHTML = fil.map(c => {
+    const ps=prazoStatus(c), pc=ps==='vencido'?'prazo-vencido':ps==='urgente'?'prazo-alerta':'prazo-ok';
+    return `<tr>
+      <td><span class="proto-code">${c.ProtocoloCoelba||c.Titulo||'—'}</span>${c.Complementar?`<span class="comp-tag">compl.</span>`:''}</td>
+      <td style="font-size:12px">${c.Categoria||'—'}</td>
+      <td style="font-size:12px">${c.UC||'—'}</td>
+      <td>${instTag(c.Instancia)}</td>
+      <td style="font-size:12px;color:var(--muted)">${c.DataAbertura?fmtDate(c.DataAbertura):'—'}</td>
+      <td class="${pc}">${prazoLabel(c)}</td>
+      <td>${statusBadge(c.Status)}</td>
+      <td style="font-size:12px;color:var(--mid)">${c.Responsavel||'—'}</td>
+      <td><button class="btn-secondary btn-sm" onclick="abrirDetalhe(${c.ID})">Ver</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODAL NOVO
+// ═══════════════════════════════════════════════════════
+function abrirModalNovo() {
+  ['f-instancia','f-categoria','f-uc','f-protocolo','f-responsavel','f-complementar','f-descricao','f-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+  document.getElementById('prazo-preview').textContent = '— selecione instância e data';
+  document.getElementById('modalNovo').classList.add('open');
+}
+
+async function salvarNovoChamado() {
+  const instancia=document.getElementById('f-instancia').value, categoria=document.getElementById('f-categoria').value;
+  const uc=document.getElementById('f-uc').value.trim(), protocolo=document.getElementById('f-protocolo').value.trim();
+  const dataAbertura=document.getElementById('f-data').value, respVal=document.getElementById('f-responsavel').value;
+  const complementar=document.getElementById('f-complementar').value.trim(), descricao=document.getElementById('f-descricao').value.trim();
+  const obs=document.getElementById('f-obs').value.trim();
+  if (!instancia||!categoria||!uc||!dataAbertura||!respVal||!descricao) { toast('⚠ Preencha todos os campos obrigatórios.','error'); return; }
+  const [responsavel,emailResp] = respVal.split('|');
+  const prazoDate = calcPrazoDate(instancia, dataAbertura);
+  const idChamado = `CH-${new Date().toISOString().replace(/[-:T.Z]/g,'').slice(0,14)}`;
+  const payload = {
+    Title: idChamado, Instancia: instancia, Categoria: categoria, UC: uc,
+    ProtocoloCoelba: protocolo, DataAbertura: dataAbertura?new Date(dataAbertura+'T12:00:00').toISOString():null,
+    PrazoSLA: prazoDate?prazoDate.toISOString():null, Status: 'Em andamento',
+    Responsavel: responsavel, EmailResponsavel: emailResp, Complementar: complementar,
+    Descricao: descricao, Observacoes: obs, Historico: '',
+    ProximoLembrete: addBizDays(new Date(),7).toISOString()
+  };
+  const btn=document.getElementById('btn-salvar-novo');
+  btn.innerHTML=`<span class="spinner"></span> Salvando…`; btn.disabled=true;
+  try {
+    await spPost('', payload);
+    fecharModal('modalNovo');
+    toast('✓ Chamado aberto com sucesso!','success');
+    await carregarChamados();
+  } catch(e) { toast('✗ Erro: '+e.message,'error'); }
+  btn.innerHTML='＋ Abrir Chamado'; btn.disabled=false;
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODAL DETALHE
+// ═══════════════════════════════════════════════════════
+function abrirDetalhe(id) {
+  const c = allChamados.find(x=>x.ID===id); if(!c) return;
+  chamadoAtual = c;
+  document.getElementById('det-titulo').textContent = `Chamado ${c.Titulo||'#'+c.ID}`;
+  document.getElementById('det-sub').textContent = `${c.Categoria} · ${c.Instancia}`;
+  const ps=prazoStatus(c);
+  const ps_style = ps==='vencido'?'color:var(--red)':ps==='urgente'?'color:var(--amber)':'color:var(--green)';
+  document.getElementById('det-info').innerHTML = `
+    <div class="detail-item"><span class="detail-key">ID</span><span class="detail-val">${c.Titulo||'—'}</span></div>
+    <div class="detail-item"><span class="detail-key">Protocolo Coelba</span><span class="detail-val">${c.ProtocoloCoelba||'—'}</span></div>
+    <div class="detail-item"><span class="detail-key">UC / Cliente</span><span class="detail-val">${c.UC||'—'}</span></div>
+    <div class="detail-item"><span class="detail-key">Instância</span><span class="detail-val">${instTag(c.Instancia)}</span></div>
+    <div class="detail-item"><span class="detail-key">Status</span><span class="detail-val">${statusBadge(c.Status)}</span></div>
+    <div class="detail-item"><span class="detail-key">Abertura</span><span class="detail-val">${fmtDate(c.DataAbertura)}</span></div>
+    <div class="detail-item"><span class="detail-key">Prazo SLA</span><span class="detail-val" style="${ps_style}">${fmtDate(c.PrazoSLA)}</span></div>
+    <div class="detail-item"><span class="detail-key">Responsável</span><span class="detail-val">${c.Responsavel||'—'}</span></div>
+    ${c.Complementar?`<div class="detail-item"><span class="detail-key">Complementar a</span><span class="detail-val">${c.Complementar}</span></div>`:''}
+    <div class="detail-item" style="grid-column:1/-1"><span class="detail-key">Descrição</span><span class="detail-val">${c.Descricao||'—'}</span></div>
+  `;
+  document.getElementById('upd-status').value = c.Status||'Em andamento';
+  document.getElementById('upd-protocolo').value = '';
+  document.getElementById('upd-resposta').value = '';
+  let hist=[]; try { hist=c.Historico?JSON.parse(c.Historico):[]; } catch{}
+  const hEl=document.getElementById('det-historico');
+  hEl.innerHTML = hist.length
+    ? hist.slice().reverse().map(h=>`<div class="log-item"><div class="log-date">${h.data||''}</div><div class="log-text">${h.texto||''}</div></div>`).join('')
+    : '<div style="color:var(--muted);font-size:12px">Nenhuma atualização registrada.</div>';
+  document.getElementById('modalDetalhe').classList.add('open');
+}
+
+async function salvarAtualizacao() {
+  if (!chamadoAtual) return;
+  const novoStatus=document.getElementById('upd-status').value;
+  const novoProtoc=document.getElementById('upd-protocolo').value.trim();
+  const resposta=document.getElementById('upd-resposta').value.trim();
+  if (!resposta) { toast('⚠ Insira uma resposta antes de salvar.','error'); return; }
+  let hist=[]; try { hist=chamadoAtual.Historico?JSON.parse(chamadoAtual.Historico):[]; } catch{}
+  hist.push({ data: new Date().toLocaleDateString('pt-BR'), texto: resposta });
+  const payload = { Status: novoStatus, Historico: JSON.stringify(hist), ProximoLembrete: addBizDays(new Date(),7).toISOString() };
+  if (novoProtoc) payload.ProtocoloCoelba = novoProtoc;
+  const btn=document.getElementById('btn-salvar-upd');
+  btn.innerHTML=`<span class="spinner"></span> Salvando…`; btn.disabled=true;
+  try {
+    await spMerge(chamadoAtual.ID, payload);
+    fecharModal('modalDetalhe');
+    toast('✓ Chamado atualizado!','success');
+    await carregarChamados();
+  } catch(e) { toast('✗ Erro: '+e.message,'error'); }
+  btn.innerHTML='✓ Salvar Atualização'; btn.disabled=false;
+}
+
+// ═══════════════════════════════════════════════════════
+//  UI UTILS
+// ═══════════════════════════════════════════════════════
+function showTab(tab) {
+  ['dashboard','lista'].forEach(t=>{
+    document.getElementById('pane-'+t).classList.toggle('hidden',t!==tab);
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+}
+function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+let toastT;
+function toast(msg, type='success') {
+  const el=document.getElementById('toast');
+  document.getElementById('toast-icon').textContent = type==='success'?'✓ ':'⚠ ';
+  document.getElementById('toast-msg').textContent = msg;
+  el.style.borderColor = type==='success'?'var(--green)':'var(--red)';
+  el.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>el.classList.remove('show'), 4000);
+}
+
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click', e=>{ if(e.target===el) el.classList.remove('open'); });
+});
+
+document.getElementById('f-data') && (document.getElementById('f-data').value = new Date().toISOString().split('T')[0]);
+
+window.addEventListener("load", function() { inicializar().catch(console.error); });
+</script>
+</body>
+</html>
